@@ -1,3 +1,5 @@
+##  Домашнее задание к уроку 1
+
 ### Установка образа через vagrant
 ```bash
 ~/Projects/otus-linux$ env -u GEM_HOME -u GEM_PATH vagrant up
@@ -87,4 +89,25 @@ sudo yum install bison
 make rpm-pkg -j3
 ```
 
+![](images/Screenshot_20190426_171925.png)
+
+### Устанавливаю пакеты
+
+```bash
+sudo rpm -iUv ~/rpmbuild/RPMS/x86_64/*.rpm
+```
+
+### Перезагружаю систему
+
+```bash
+sudo reboot
+```
+
+### Проверяю версию
+
+```bash
+uname -a
+```
+
+![](images/Screenshot_20190426_173201.png)
 
