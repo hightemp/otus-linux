@@ -5,7 +5,7 @@
 ~/Projects/otus-linux$ env -u GEM_HOME -u GEM_PATH vagrant up
 ```
 
-![](images/Screenshot_20190425_221508.png)
+![](images/lesson1/Screenshot_20190425_221508.png)
 
 ### Запуск образа
 ```bash
@@ -18,7 +18,7 @@
 curl https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.0.9.tar.xz -O
 ```
 
-![](images/Screenshot_20190425_225314.png)
+![](images/lesson1/Screenshot_20190425_225314.png)
 
 ### Установка пакетов, необходимых для сборки ядра
 
@@ -28,7 +28,7 @@ sudo yum install elfutils-libelf-devel
 sudo yum install rpm-build
 ```
 
-![](images/Screenshot_20190425_225854.png)
+![](images/lesson1/Screenshot_20190425_225854.png)
 
 ### Распаковка архива с исходниками ядра
 
@@ -43,7 +43,7 @@ cd linux-5.0.9/
 sudo cp -v /boot/config-3.10.0-957.5.1.el7.x86_64 .config
 ```
 
-![](images/Screenshot_20190425_233123.png)
+![](images/lesson1/Screenshot_20190425_233123.png)
 
 ### Запускаю make menuconfig
 
@@ -51,7 +51,7 @@ sudo cp -v /boot/config-3.10.0-957.5.1.el7.x86_64 .config
 make menuconfig
 ```
 
-![](images/Screenshot_20190425_234204.png)
+![](images/lesson1/Screenshot_20190425_234204.png)
 
 Получаю ошибку
 
@@ -71,15 +71,15 @@ sudo yum install bison
 
 ### Запускаю make menuconfig
 
-![](images/Screenshot_20190425_235024.png)
+![](images/lesson1/Screenshot_20190425_235024.png)
 
 ### Нажимаю Save
 
-![](images/Screenshot_20190425_235155.png)
+![](images/lesson1/Screenshot_20190425_235155.png)
 
 ### Нажимаю OK
 
-![](images/Screenshot_20190425_235330.png)
+![](images/lesson1/Screenshot_20190425_235330.png)
 
 ### Выхожу
 
@@ -89,7 +89,7 @@ sudo yum install bison
 make rpm-pkg -j3
 ```
 
-![](images/Screenshot_20190426_171925.png)
+![](images/lesson1/Screenshot_20190426_171925.png)
 
 ### Устанавливаю пакеты
 
@@ -109,5 +109,5 @@ sudo reboot
 uname -a
 ```
 
-![](images/Screenshot_20190426_173201.png)
+![](images/lesson1/Screenshot_20190426_173201.png)
 
