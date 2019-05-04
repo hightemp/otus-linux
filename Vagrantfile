@@ -5,37 +5,34 @@ MACHINES = {
   :otuslinux => {
         :box_name => "centos/7",
         :ip_addr => '192.168.11.101',
-	:disks => {
-		:sata1 => {
-			:dfile => './sata1.vdi',
-			:size => 250,
-			:port => 1
-		},
-		:sata2 => {
-                        :dfile => './sata2.vdi',
-                        :size => 250, # Megabytes
-			:port => 2
-		},
-                :sata3 => {
-                        :dfile => './sata3.vdi',
-                        :size => 250,
-                        :port => 3
-                },
-                :sata4 => {
-                        :dfile => './sata4.vdi',
-                        :size => 250, # Megabytes
-                        :port => 4
-                },
-                :sata5 => {
-                        :dfile => './sata5.vdi',
-                        :size => 250, # Megabytes
-                        :port => 5
-                }
-
-	}
-
-		
-  },
+        :disks => {
+            :sata1 => {
+                :dfile => './sata1.vdi',
+                :size => 250,
+                :port => 1
+            },
+            :sata2 => {
+                :dfile => './sata2.vdi',
+                :size => 250, # Megabytes
+                :port => 2
+            },
+            :sata3 => {
+                :dfile => './sata3.vdi',
+                :size => 250,
+                :port => 3
+            },
+            :sata4 => {
+                :dfile => './sata4.vdi',
+                :size => 250, # Megabytes
+                :port => 4
+            },
+            :sata5 => {
+                :dfile => './sata5.vdi',
+                :size => 250, # Megabytes
+                :port => 5
+            }
+        }
+    },
 }
 
 Vagrant.configure("2") do |config|
@@ -52,15 +49,15 @@ Vagrant.configure("2") do |config|
           box.vm.network "private_network", ip: boxconfig[:ip_addr]
 
           box.vm.provider :virtualbox do |vb|
-            	  vb.customize ["modifyvm", :id, "--memory", "1024"]
+                  vb.customize ["modifyvm", :id, "--memory", "1024"]
                   needsController = false
-		  boxconfig[:disks].each do |dname, dconf|
-			  unless File.exist?(dconf[:dfile])
-				vb.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
+          boxconfig[:disks].each do |dname, dconf|
+              unless File.exist?(dconf[:dfile])
+                vb.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
                                 needsController =  true
                           end
 
-		  end
+          end
                   if needsController == true
                      vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata" ]
                      boxconfig[:disks].each do |dname, dconf|
@@ -68,11 +65,34 @@ Vagrant.configure("2") do |config|
                      end
                   end
           end
- 	  box.vm.provision "shell", inline: <<-SHELL
-	      mkdir -p ~root/.ssh
-              cp ~vagrant/.ssh/auth* ~root/.ssh
-	      yum install -y mdadm smartmontools hdparm gdisk
-  	  SHELL
+        box.vm.provision "shell", inline: <<-SHELL
+            mkdir -p ~root/.ssh
+            cp ~vagrant/.ssh/auth* ~root/.ssh
+            yum install -y mdadm smartmontools hdparm gdisk
+            sudo parted -s -a optimal /dev/sdb mklabel gpt -- mkpart primary ext4 0% 100%
+            sudo parted -s -a optimal /dev/sdc mklabel gpt -- mkpart primary ext4 0% 100%
+            sudo parted -s -a optimal /dev/sdd mklabel gpt -- mkpart primary ext4 0% 100%
+            sudo parted -s -a optimal /dev/sde mklabel gpt -- mkpart primary ext4 0% 100%
+            sudo parted -s -a optimal /dev/sdf mklabel gpt -- mkpart primary ext4 0% 100%
+            sudo mdadm --create --verbose /dev/md0 -l 10 -n 5 /dev/sd{b,c,d,e,f}1
+            sudo mkdir /etc/mdadm
+            sudo sh -c 'echo "DEVICE partitions" > /etc/mdadm/mdadm.conf'
+            sudo sh -c "mdadm --detail --scan --verbose | awk '/ARRAY/ {print}' >> /etc/mdadm/mdadm.conf"
+            sudo parted -s /dev/md0 mklabel gpt
+            sudo parted /dev/md0 mkpart primary ext4 0% 20%
+            sudo parted /dev/md0 mkpart primary ext4 20% 40%
+            sudo parted /dev/md0 mkpart primary ext4 40% 60%
+            sudo parted /dev/md0 mkpart primary ext4 60% 80%
+            sudo parted /dev/md0 mkpart primary ext4 80% 100%
+            for i in $(seq 1 5); do sudo mkfs.ext4 /dev/md0p$i; done
+            sudo mkdir -p /raid/part{1,2,3,4,5}
+            for i in $(seq 1 5); do sudo mount /dev/md0p$i /raid/part$i; done
+            sudo sh -c 'echo "/dev/md0p1 /raid/part1 ext4 defaults 1 2" >> /etc/fstab'
+            sudo sh -c 'echo "/dev/md0p2 /raid/part2 ext4 defaults 1 2" >> /etc/fstab'
+            sudo sh -c 'echo "/dev/md0p3 /raid/part3 ext4 defaults 1 2" >> /etc/fstab'
+            sudo sh -c 'echo "/dev/md0p4 /raid/part4 ext4 defaults 1 2" >> /etc/fstab'
+            sudo sh -c 'echo "/dev/md0p5 /raid/part5 ext4 defaults 1 2" >> /etc/fstab'
+        SHELL
 
       end
   end

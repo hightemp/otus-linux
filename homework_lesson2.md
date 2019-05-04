@@ -11,11 +11,11 @@ vim Vagrantfile
 #### Добавляю строку
 
 ```
-                :sata5 => {
-                        :dfile => './sata5.vdi',
-                        :size => 250, # Megabytes
-                        :port => 5
-                }
+:sata5 => {
+        :dfile => './sata5.vdi',
+        :size => 250, # Megabytes
+        :port => 5
+}
 ```
 
 #### Сохраняю
