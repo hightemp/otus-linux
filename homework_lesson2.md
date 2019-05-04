@@ -197,3 +197,34 @@ sudo vi /etc/fstab
 /dev/md0p4 /raid/part4 ext4 defaults 1 2
 /dev/md0p5 /raid/part5 ext4 defaults 1 2
 ```
+
+## Итоговый скрипт для Vagrant
+
+```bash
+mkdir -p ~root/.ssh
+cp ~vagrant/.ssh/auth* ~root/.ssh
+yum install -y mdadm smartmontools hdparm gdisk
+sudo parted -s -a optimal /dev/sdb mklabel gpt -- mkpart primary ext4 0% 100%
+sudo parted -s -a optimal /dev/sdc mklabel gpt -- mkpart primary ext4 0% 100%
+sudo parted -s -a optimal /dev/sdd mklabel gpt -- mkpart primary ext4 0% 100%
+sudo parted -s -a optimal /dev/sde mklabel gpt -- mkpart primary ext4 0% 100%
+sudo parted -s -a optimal /dev/sdf mklabel gpt -- mkpart primary ext4 0% 100%
+sudo mdadm --create --verbose /dev/md0 -l 10 -n 5 /dev/sd{b,c,d,e,f}1
+sudo mkdir /etc/mdadm
+sudo sh -c 'echo "DEVICE partitions" > /etc/mdadm/mdadm.conf'
+sudo sh -c "mdadm --detail --scan --verbose | awk '/ARRAY/ {print}' >> /etc/mdadm/mdadm.conf"
+sudo parted -s /dev/md0 mklabel gpt
+sudo parted /dev/md0 mkpart primary ext4 0% 20%
+sudo parted /dev/md0 mkpart primary ext4 20% 40%
+sudo parted /dev/md0 mkpart primary ext4 40% 60%
+sudo parted /dev/md0 mkpart primary ext4 60% 80%
+sudo parted /dev/md0 mkpart primary ext4 80% 100%
+for i in $(seq 1 5); do sudo mkfs.ext4 /dev/md0p$i; done
+sudo mkdir -p /raid/part{1,2,3,4,5}
+for i in $(seq 1 5); do sudo mount /dev/md0p$i /raid/part$i; done
+sudo sh -c 'echo "/dev/md0p1 /raid/part1 ext4 defaults 1 2" >> /etc/fstab'
+sudo sh -c 'echo "/dev/md0p2 /raid/part2 ext4 defaults 1 2" >> /etc/fstab'
+sudo sh -c 'echo "/dev/md0p3 /raid/part3 ext4 defaults 1 2" >> /etc/fstab'
+sudo sh -c 'echo "/dev/md0p4 /raid/part4 ext4 defaults 1 2" >> /etc/fstab'
+sudo sh -c 'echo "/dev/md0p5 /raid/part5 ext4 defaults 1 2" >> /etc/fstab'
+```
