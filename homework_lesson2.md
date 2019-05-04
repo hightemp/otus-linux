@@ -115,5 +115,85 @@ sudo sh -c "mdadm --detail --scan --verbose | awk '/ARRAY/ {print}' >> /etc/mdad
 
 ![](images/lesson2/Screenshot_20190504_193719.png)
 
+### Добавляю запись в /etc/fstab
 
+```bash
+sudo vi /etc/fstab
+```
 
+Добавляю следующее
+
+```bash
+/dev/md0 /raid ext4 defaults 1 2
+```
+
+### Ломаю диск /dev/sdb1
+
+```bash
+sudo mdadm /dev/md0 --fail /dev/sdb1
+```
+
+### Проверяю
+
+```bash
+cat /proc/mdstat
+```
+
+![](images/lesson2/Screenshot_20190504_195426.png)
+
+### Чиню
+
+```bash
+sudo mdadm /dev/md0 --remove /dev/sdb1
+sudo mdadm /dev/md0 --add /dev/sdb1
+```
+
+### Проверяю
+
+```bash
+cat /proc/mdstat
+```
+
+![](images/lesson2/Screenshot_20190504_195831.png)
+
+### Размонтирую RAID
+
+```bash
+sudo umount /dev/md0
+```
+
+### Удаляю таблицу разделов и фс
+
+```bash
+sudo dd if=/dev/zero of=/dev/md0 bs=512 count=1
+```
+
+### Создаю GPT и 5 партиций
+
+```bash
+sudo parted -s /dev/md0 mklabel gpt
+sudo parted /dev/md0 mkpart primary ext4 0% 20%
+sudo parted /dev/md0 mkpart primary ext4 20% 40%
+sudo parted /dev/md0 mkpart primary ext4 40% 60%
+sudo parted /dev/md0 mkpart primary ext4 60% 80%
+sudo parted /dev/md0 mkpart primary ext4 80% 100%
+for i in $(seq 1 5); do sudo mkfs.ext4 /dev/md0p$i; done
+sudo mkdir -p /raid/part{1,2,3,4,5}
+for i in $(seq 1 5); do sudo mount /dev/md0p$i /raid/part$i; done
+```
+
+### Изменяю /etc/fstab
+
+```bash
+sudo vi /etc/fstab
+```
+
+Заменяю `/dev/md0 /raid ext4 defaults 1 2` на
+
+```bash
+/dev/md0p1 /raid/part1 ext4 defaults 1 2
+/dev/md0p2 /raid/part2 ext4 defaults 1 2
+/dev/md0p3 /raid/part3 ext4 defaults 1 2
+/dev/md0p4 /raid/part4 ext4 defaults 1 2
+/dev/md0p5 /raid/part5 ext4 defaults 1 2
+```
