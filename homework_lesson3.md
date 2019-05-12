@@ -178,7 +178,7 @@ sudo cp -aR /home/* /mnt/
 sudo rm -rf /home/*
 sudo umount /mnt
 sudo mount /dev/VolGroup00/LogVol_Home /home/
-```bash
+```
 
 ### Добавляю запись в `/etc/fstab`
 
