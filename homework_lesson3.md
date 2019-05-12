@@ -69,5 +69,31 @@ lsblk
 
 ![](/images/lesson3/Screenshot_20190512_141659.png)
 
+### Удаляю старый раздел
+
+```bash
+sudo lvremove /dev/VolGroup00/LogVol00
+```
+
+### Создаю новый раздел на 8G
+
+```bash
+sudo lvcreate -n VolGroup00/LogVol00 -L 8G /dev/VolGroup00
+```
+
+### Создаю фс и монтирую
+
+```bash
+sudo mkfs.xfs /dev/VolGroup00/LogVol00
+sudo mount /dev/VolGroup00/LogVol00 /mnt
+```
+
+### Копирую все обратно
+
+```bash
+sudo xfsdump -J - /dev/vg_root/lv_root | sudo xfsrestore -J - /mnt
+```
+
+![](/images/lesson3/Screenshot_20190512_144013.png)
 
 
