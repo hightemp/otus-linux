@@ -97,3 +97,19 @@ sudo xfsdump -J - /dev/vg_root/lv_root | sudo xfsrestore -J - /mnt
 ![](/images/lesson3/Screenshot_20190512_144013.png)
 
 
+### Переконфигурируем GRUB
+
+```bash
+for i in /proc/ /sys/ /dev/ /run/ /boot/; do sudo mount --bind $i /mnt/$i; done
+sudo chroot /mnt/
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+```
+
+### Обновляю образы
+
+```bash
+cd /boot ; for i in `ls initramfs-*img`; do sudo dracut -v $i `echo $i|sed "s/initramfs-//g;
+s/.img//g"` --force; done
+```
+
+
