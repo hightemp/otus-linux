@@ -168,4 +168,26 @@ sudo vgremove /dev/vg_root
 sudo pvremove /dev/sdb
 ```
 
+### Создаю том для /home
+
+```bash
+sudo lvcreate -n LogVol_Home -L 2G /dev/VolGroup00
+sudo mkfs.xfs /dev/VolGroup00/LogVol_Home
+sudo mount /dev/VolGroup00/LogVol_Home /mnt/
+sudo cp -aR /home/* /mnt/ 
+sudo rm -rf /home/*
+sudo umount /mnt
+sudo mount /dev/VolGroup00/LogVol_Home /home/
+```bash
+
+### Добавляю запись в `/etc/fstab`
+
+```bash
+cd /
+sudo sh -c "echo \"`blkid | grep Home | awk '{print $2}'` /home xfs defaults 0 0\" >> /etc/fstab"
+```
+
+![](/images/lesson3/Screenshot_20190512_152951.png)
+
+
 
