@@ -114,4 +114,14 @@ s/.img//g"` --force; done
 
 ![](/images/lesson3/Screenshot_20190512_145445.png)
 
+### Выделяю том под /var
+
+```bash
+sudo pvcreate /dev/sdc /dev/sdd
+sudo vgcreate vg_var /dev/sdc /dev/sdd
+sudo lvcreate -L 950M -m1 -n lv_var vg_var
+```
+
+![](/images/lesson3/Screenshot_20190512_145946.png)
+
 
