@@ -189,5 +189,35 @@ sudo sh -c "echo \"`blkid | grep Home | awk '{print $2}'` /home xfs defaults 0 0
 
 ![](/images/lesson3/Screenshot_20190512_152951.png)
 
+### Генерирую файлы
+
+```bash
+sudo touch /home/file{1..20}
+```
+
+### Делаю снапшот
+
+```bash
+sudo lvcreate -L 100MB -s -n home_snap /dev/VolGroup00/LogVol_Home
+```
+
+### Удаляю часть файлов
+
+```bash
+sudo rm -f /home/file{11..20}
+```
+
+![](/images/lesson3/Screenshot_20190512_154249.png)
+
+### Восстанавливаю
+
+```bash
+sudo umount /home
+sudo lvconvert --merge /dev/VolGroup00/home_snap
+sudo mount /home
+```
+
+![](/images/lesson3/Screenshot_20190512_154347.png)
+
 
 
