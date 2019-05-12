@@ -124,4 +124,33 @@ sudo lvcreate -L 950M -m1 -n lv_var vg_var
 
 ![](/images/lesson3/Screenshot_20190512_145946.png)
 
+### Создаю ФС и перемещаю туда /var
+
+```bash
+sudo mkfs.ext4 /dev/vg_var/lv_var
+sudo mount /dev/vg_var/lv_var /mnt
+sudo cp -aR /var/* /mnt/
+```
+
+### Сохраняю содержимое /var
+
+```bash
+sudo mkdir /tmp/oldvar && mv /var/* /tmp/oldvar
+```
+
+### Монтирую /var
+
+```bash
+sudo umount /mnt 
+sudo mount /dev/vg_var/lv_var /var
+```
+
+### Добавляю запись в /etc/fstab
+
+```bash
+sudo sh -c "echo \"`blkid | grep var: | awk '{print $2}'` /var ext4 defaults 0 0\" >> /etc/fstab"
+```
+
+![](/images/lesson3/Screenshot_20190512_150907.png)
+
 
