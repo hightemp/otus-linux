@@ -112,4 +112,6 @@ cd /boot ; for i in `ls initramfs-*img`; do sudo dracut -v $i `echo $i|sed "s/in
 s/.img//g"` --force; done
 ```
 
+![](/images/lesson3/Screenshot_20190512_145445.png)
+
 
