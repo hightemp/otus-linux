@@ -153,4 +153,19 @@ sudo sh -c "echo \"`blkid | grep var: | awk '{print $2}'` /var ext4 defaults 0 0
 
 ![](/images/lesson3/Screenshot_20190512_150907.png)
 
+### Перезагружаюсь
+
+```bash
+exit
+sudo reboot
+```
+
+### Удаляю `lv_root`
+
+```bash
+sudo lvremove /dev/vg_root/lv_root
+sudo vgremove /dev/vg_root
+sudo pvremove /dev/sdb
+```
+
 
