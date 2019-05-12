@@ -47,3 +47,12 @@ s/.img//g"` --force; done
 ```
 
 ![](/images/lesson3/Screenshot_20190512_140232.png)
+
+### Заменяю в /boot/grub2/grub.cfg `rd.lvm.lv=VolGroup00/LogVol00` на `rd.lvm.lv=vg_root/lv_root`
+
+```bash
+sudo sed -i -- 's/VolGroup00\/LogVol00/vg_root\/lv_root/g' /boot/grub2/grub.cfg
+```
+
+
+
