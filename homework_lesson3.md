@@ -54,5 +54,20 @@ s/.img//g"` --force; done
 sudo sed -i -- 's/VolGroup00\/LogVol00/vg_root\/lv_root/g' /boot/grub2/grub.cfg
 ```
 
+### Перезагружаюсь
+
+```bash
+exit
+sudo reboot
+```
+
+### Проверяю
+
+```bash
+lsblk
+```
+
+![](/images/lesson3/Screenshot_20190512_141659.png)
+
 
 
