@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO="test@test.com"
+
+0 * * * * root /home/vagrant/cron_script.sh
