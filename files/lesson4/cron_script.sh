@@ -18,36 +18,48 @@ trap 'rm -f "$sLOCKFILE"; exit $?' INT TERM ERR EXIT
 #declare -A aURL
 aIP=()
 aURL=()
+aHTTP_CODE=()
+aERROR=()
 
 sFROMDATE=""
 sTODATE=""
 
-while read LINE; do 
+while read sLINE; do 
     if [[ "$sFROMDATE" == "" ]]; then
-        sFROMDATE=`echo $LINE | awk '{print $4}' | sed 's/\[//'`
+        sFROMDATE=`echo $sLINE | awk '{print $4}' | sed 's/\[//'`
     fi
-    sIP=`echo $LINE | awk '{print $1}'`
+    
+    sIP=`echo $sLINE | awk '{print $1}'`
     aIP+=($sIP)
-    sURL=`echo $LINE | awk '{print $7}'`
+    
+    sURL=`echo $sLINE | awk '{print $7}'`
     aURL+=($sURL)
-#     if [ ${aIP[$IP]+_} ]; then
-#         (( $aIP["$IP"]++ ))
-#     else
-#         $aIP[$IP]=0
-#     fi
+    
+    sHTTP_CODE=`echo $sLINE | awk '{print $9}'`
+    
+    if [[ "$sHTTP_CODE" =~ ^[1-5][0-9][0-9]$ ]]; then
+        aHTTP_CODE+=($sHTTP_CODE)
+
+        [[ "$sHTTP_CODE" -ge 500 ]] && aERROR+=("$sLINE")
+    fi
 done < $sLOGFILE
 
 sTODATE=`tail -1 $sLOGFILE | awk '{print $4}' | sed 's/\[//'`
 
 echo "REPORT"
 echo "$sFROMDATE - $sTODATE"
-
+echo ""
 echo "IP:"
 printf '%s\n' "${aIP[@]}" | sort | uniq -c | sort -rn | head -n$X
-
+echo ""
 echo "URL:"
 printf '%s\n' "${aURL[@]}" | sort | uniq -c | sort -rn | head -n$Y
-
+echo ""
+echo "HTTP Statuses:"
+printf '%s\n' "${aHTTP_CODE[@]}" | sort | uniq -c | sort -rn
+echo ""
+echo "Errors:"
+printf '%s\n' "${aERROR[@]}"
 
 rm -f $sLOCKFILE
 trap - INT TERM ERR EXIT
