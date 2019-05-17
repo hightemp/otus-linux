@@ -3,7 +3,7 @@
 X=5
 Y=5
 
-sLOGFILE=access.log
+sLOGFILE=access.log # /var/log/nginx/access.log
 sLOCKFILE=/var/tmp/cron_script.lock
 
 if [ -f $sLOCKFILE ]; then
