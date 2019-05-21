@@ -22,7 +22,11 @@ sFormat='%5s %-9s%-7s%8s %-100s\n'
 
 printf "$sFormat" PID TTY STAT TIME COMMAND
 
-for sProccessDir in `ls /proc | sort -V`; do
+for sProccessDir in `ls /proc | egrep '^[0-9]' | sort -V`; do
+	if [ ! -d "/proc/$sProccessDir" ]; then
+		continue
+	fi
+
 	if [[ $iCounter -gt iMAX_LIST_LENGTH ]]; then
 		continue
 	fi
