@@ -84,8 +84,7 @@ $ tail -f /var/log/watchlog.log
 
 ![](images/lesson7/Screenshot_20190526_234134.png)
 
-## Из epel установить spawn-fcgi и переписать init-скрипт на unit-файл. Имя
-сервиса должно также называться.
+## Из epel установить spawn-fcgi и переписать init-скрипт на unit-файл. Имя сервиса должно также называться.
 
 ### Устанавливаю spawn-fcgi + доп. пакеты
 
