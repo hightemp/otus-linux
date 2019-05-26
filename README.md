@@ -241,3 +241,5 @@ $ yum list | grep otus
 $ yum install percona-release -y
 ```
 
+![](/images/lesson6/Screenshot_20190526_190803.png)
+
