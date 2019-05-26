@@ -69,6 +69,79 @@ Vagrant.configure("2") do |config|
             mkdir -p ~root/.ssh
             cp ~vagrant/.ssh/auth* ~root/.ssh
             yum install -y mdadm smartmontools hdparm gdisk
+            sudo su -
+            yum install -y redhat-lsb-core wget rpmdevtools rpm-build reaterepo yum-utils
+            cd /home/vagrant
+            mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+            yum install -y git
+            git clone https://github.com/hightemp/getdents_ls.git
+            yum install -y gcc
+            yum install -y gcc-c++
+            mkdir /tmp/gendents_ls
+            cp -r getdents_ls/* /tmp/getdents_ls-1.0/
+            cd /tmp
+            tar -cvzf /home/vagrant/rpmbuild/SOURCES/getdents_ls-1.0.tar.gz getdents_ls-1.0
+            cd /home/vagrant/rpmbuild/SPECS
+            rpmdev-newspec getdents_ls
+            cat >> getdents_ls.spec << EOF
+Name:           getdents_ls
+Version:        1.0
+Release:        1%{?dist}
+Summary:        Large directories viewer
+
+License:       GPLv3+
+URL:           https://github.com/hightemp/getdents_ls
+Source0:       getdents_ls-1.0.tar.gz
+
+BuildRequires: gcc
+BuildRequires: make
+
+%description
+
+
+%prep
+%setup -q
+
+
+%build
+make %{?_smp_mflags}
+
+
+%install
+%make_install
+
+
+%files
+%{_bindir}/%{name}
+%doc
+
+
+
+%changelog
+EOF
+            rpmbuild -bs getdents_ls.spec
+            rpmbuild --rebuild /home/vagrant/rpmbuild/SRPMS/getdents_ls-1.0-1.el7.src.rpm
+            rm -rf /home/vagrant/getdents_ls
+            rm -rf /tmp/getdents_ls-1.0
+            yum localinstall -y /home/vagrant/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm
+            cd /home/vagrant
+            yum install -y epel-release
+            yum install -y nginx
+            mkdir /usr/share/nginx/html/repo
+            cp /home/vagrant/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm /usr/share/nginx/html/repo
+            wget http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm -O /usr/share/nginx/html/repo/percona-release-0.1-6.noarch.rpm
+            createrepo /usr/share/nginx/html/repo/
+            mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.old
+            awk -v RS="" '{sub(/location\s*\/\s*{[^}]*?}/,"location \/ { \n root \/usr\/share\/nginx\/html\/repo; \n index index.html index.htm; \n autoindex on; # Добавили эту директиву \n }")}1' /etc/nginx/nginx.conf.old > /etc/nginx/nginx.conf
+            systemctl restart nginx
+            cat >> /etc/yum.repos.d/otus.repo << EOF
+[otus]
+name=otus-linux
+baseurl=http://localhost
+gpgcheck=0
+enabled=1
+EOF
+            yum install percona-release -y
           SHELL
   
         end
