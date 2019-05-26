@@ -21,7 +21,7 @@ $ pwd
 $ whoami
 vagrant
 $ sudo su -
-$ cd /home/vagrant
+$ cd ~
 ```
 
 ### Создаю директорию rpmbuild
@@ -52,16 +52,16 @@ $ yum install -y gcc-c++
 ### Собираю tarball
 
 ```console
-$ mkdir /tmp/gendents_ls
+$ mkdir /tmp/getdents_ls-1.0
 $ cp -r getdents_ls/* /tmp/getdents_ls-1.0/
 $ cd /tmp
-$ tar -cvzf /home/vagrant/rpmbuild/SOURCES/getdents_ls-1.0.tar.gz getdents_ls-1.0
+$ tar -cvzf ~/rpmbuild/SOURCES/getdents_ls-1.0.tar.gz getdents_ls-1.0
 ```
 
 ### Создаю SPEC файл
 
 ```console
-$ cd /home/vagrant/rpmbuild/SPECS
+$ cd ~/rpmbuild/SPECS
 $ rpmdev-newspec getdents_ls
 ```
 
@@ -105,18 +105,10 @@ make %{?_smp_mflags}
 
 ```
 
-### Создаю пакеты
-
-#### С исходниками
+### Создаю пакет
 
 ```console
-$ rpmbuild -bs getdents_ls.spec
-```
-
-#### С бинарниками
-
-```console
-$ rpmbuild --rebuild /home/vagrant/rpmbuild/SRPMS/getdents_ls-1.0-1.el7.src.rpm
+$ rpmbuild -bb getdents_ls.spec
 ```
 
 ### Проверяю наличие пакетов
@@ -126,14 +118,14 @@ $ rpmbuild --rebuild /home/vagrant/rpmbuild/SRPMS/getdents_ls-1.0-1.el7.src.rpm
 ### Удаляю директории
 
 ```console
-$ rm -rf /home/vagrant/getdents_ls
+$ rm -rf ~/getdents_ls
 $ rm -rf /tmp/getdents_ls-1.0 
 ```
 
 ### Устанавливаю пакет
 
 ```console
-$ yum localinstall -y /home/vagrant/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm
+$ yum localinstall -y ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm
 ```
 
 ## Создание репозитория
@@ -141,7 +133,7 @@ $ yum localinstall -y /home/vagrant/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x
 ### Устанавливаю nginx
 
 ```console
-$ cd /home/vagrant
+$ cd ~
 $ yum install -y epel-release
 $ yum install -y nginx
 ```
@@ -155,7 +147,7 @@ $ mkdir /usr/share/nginx/html/repo
 ### Копирую файлы
 
 ```console
-$ cp /home/vagrant/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm /usr/share/nginx/html/repo
+$ cp ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm /usr/share/nginx/html/repo
 ```
 
 ### Добавляю еще один пакет
