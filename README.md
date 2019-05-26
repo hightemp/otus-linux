@@ -121,3 +121,15 @@ rpmbuild --rebuild ~/rpmbuild/SRPMS/getdents_ls-1.0-1.el7.src.rpm
 
 ![](/images/lesson6/Screenshot_20190526_163256.png)
 
+### Удаляю директории
+
+```console
+$ rm -rf ~/getdents_ls
+$ rm -rf /tmp/getdents_ls-1.0 
+```
+
+### Устанавливаю пакет
+
+```console
+$ yum localinstall -y ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm
+```
