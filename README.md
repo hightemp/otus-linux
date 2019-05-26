@@ -13,7 +13,7 @@ createrepo \
 yum-utils
 ```
 
-## Создание свое пакета
+## Создание своего пакета
 
 ```console
 $ pwd
@@ -131,5 +131,84 @@ $ rm -rf /tmp/getdents_ls-1.0
 ### Устанавливаю пакет
 
 ```console
-$ yum localinstall -y ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm
+$ sudo yum localinstall -y ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm
 ```
+
+## Создание репозитория
+
+### Устанавливаю nginx
+
+```console
+$ cd ~
+$ sudo yum install -y epel-release
+$ sudo yum install -y nginx
+```
+
+### Создаю директорию repo
+
+```console
+$ sudo mkdir /usr/share/nginx/html/repo
+```
+
+### Копирую файлы
+
+```console
+$ sudo cp ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm /usr/share/nginx/html/repo
+```
+
+### Добавляю еще один пакет
+
+```console
+$ sudo wget http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm -O /usr/share/nginx/html/repo/percona-release-0.1-6.noarch.rpm
+```
+
+### Создаю репозиторий
+
+```console
+$ sudo createrepo /usr/share/nginx/html/repo/
+```
+
+### Изменяю конфигурационный файл nginx /etc/nginx/nginx.conf
+
+```console
+$ sudo vi /etc/nginx/nginx.conf
+```
+
+```nginx
+# ...
+location / {
+    root /usr/share/nginx/html/repo;
+    index index.html index.htm;
+    autoindex on; # Добавили эту директиву
+}
+# ...
+```
+
+### Перезапускаю
+
+```console
+$ sudo nginx -t
+```
+
+```console
+$ sudo systemctl start nginx
+```
+или 
+
+```
+$ sudo nginx -s reload
+```
+
+### Устанавливаю lynx 
+
+```console
+$ sudo yum install -y lynx
+```
+
+### Захожу спомощью lynx на localhost
+
+```console
+$ lynx http://localhost
+```
+
+![](/images/lesson6/Screenshot_20190526_185143.png)
