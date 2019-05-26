@@ -20,6 +20,7 @@ $ pwd
 /home/vagrant
 $ whoami
 vagrant
+$ sudo su -
 ```
 
 ### Создаю директорию rpmbuild
@@ -31,7 +32,7 @@ $ mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 ### Устанавливаю git
 
 ```console
-$ sudo yum install -y git
+$ yum install -y git
 ```
 
 ### Копирую репозиторий
@@ -43,8 +44,8 @@ $ git clone https://github.com/hightemp/getdents_ls.git
 ### Устанавливаю gcc
 
 ```console
-$ sudo yum install -y gcc
-$ sudo yum install -y gcc-c++ 
+$ yum install -y gcc
+$ yum install -y gcc-c++ 
 ```
 
 ### Собираю tarball
@@ -131,7 +132,7 @@ $ rm -rf /tmp/getdents_ls-1.0
 ### Устанавливаю пакет
 
 ```console
-$ sudo yum localinstall -y ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm
+$ yum localinstall -y ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm
 ```
 
 ## Создание репозитория
@@ -140,38 +141,38 @@ $ sudo yum localinstall -y ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.r
 
 ```console
 $ cd ~
-$ sudo yum install -y epel-release
-$ sudo yum install -y nginx
+$ yum install -y epel-release
+$ yum install -y nginx
 ```
 
 ### Создаю директорию repo
 
 ```console
-$ sudo mkdir /usr/share/nginx/html/repo
+$ mkdir /usr/share/nginx/html/repo
 ```
 
 ### Копирую файлы
 
 ```console
-$ sudo cp ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm /usr/share/nginx/html/repo
+$ cp ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm /usr/share/nginx/html/repo
 ```
 
 ### Добавляю еще один пакет
 
 ```console
-$ sudo wget http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm -O /usr/share/nginx/html/repo/percona-release-0.1-6.noarch.rpm
+$ wget http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm -O /usr/share/nginx/html/repo/percona-release-0.1-6.noarch.rpm
 ```
 
 ### Создаю репозиторий
 
 ```console
-$ sudo createrepo /usr/share/nginx/html/repo/
+$ createrepo /usr/share/nginx/html/repo/
 ```
 
 ### Изменяю конфигурационный файл nginx /etc/nginx/nginx.conf
 
 ```console
-$ sudo vi /etc/nginx/nginx.conf
+$ vi /etc/nginx/nginx.conf
 ```
 
 ```nginx
@@ -187,22 +188,22 @@ location / {
 ### Перезапускаю
 
 ```console
-$ sudo nginx -t
+$ nginx -t
 ```
 
 ```console
-$ sudo systemctl start nginx
+$ systemctl start nginx
 ```
 или 
 
 ```
-$ sudo nginx -s reload
+$ nginx -s reload
 ```
 
 ### Устанавливаю lynx 
 
 ```console
-$ sudo yum install -y lynx
+$ yum install -y lynx
 ```
 
 ### Захожу спомощью lynx на localhost
@@ -212,3 +213,25 @@ $ lynx http://localhost
 ```
 
 ![](/images/lesson6/Screenshot_20190526_185143.png)
+
+### Добавляю репозиторий
+
+```console
+$ cat >> /etc/yum.repos.d/otus.repo << EOF
+[otus]
+name=otus-linux
+baseurl=http://localhost
+gpgcheck=0
+enabled=1
+EOF
+```
+
+### Проверяю
+
+```console
+$ yum repolist enabled | grep otus
+$ yum list | grep otus
+```
+
+![](/images/lesson6/Screenshot_20190526_190402.png)
+
