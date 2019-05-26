@@ -4,7 +4,7 @@
 ###  Устанавливаю необходимые пакеты
 
 ```console
-sudo yum install -y \
+$ sudo yum install -y \
 redhat-lsb-core \
 wget \
 rpmdevtools \
@@ -16,51 +16,51 @@ yum-utils
 ## Создание свое пакета
 
 ```console
-[vagrant@lvm ~]$ pwd
+$ pwd
 /home/vagrant
-[vagrant@lvm ~]$ whoami
+$ whoami
 vagrant
 ```
 
 ### Создаю директорию rpmbuild
 
 ```console
-mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+$ mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 ```
 
 ### Устанавливаю git
 
 ```console
-sudo yum install -y git
+$ sudo yum install -y git
 ```
 
 ### Копирую репозиторий
 
 ```console
-git clone https://github.com/hightemp/getdents_ls.git
+$ git clone https://github.com/hightemp/getdents_ls.git
 ```
 
 ### Устанавливаю gcc
 
 ```console
-sudo yum install -y gcc
-sudo yum install -y gcc-c++ 
+$ sudo yum install -y gcc
+$ sudo yum install -y gcc-c++ 
 ```
 
 ### Собираю tarball
 
 ```console
-mkdir /tmp/gendents_ls
-cp -r getdents_ls/* /tmp/getdents_ls-1.0/
-cd /tmp
-tar -cvzf ~/rpmbuild/SOURCES/getdents_ls-1.0.tar.gz getdents_ls-1.0
+$ mkdir /tmp/gendents_ls
+$ cp -r getdents_ls/* /tmp/getdents_ls-1.0/
+$ cd /tmp
+$ tar -cvzf ~/rpmbuild/SOURCES/getdents_ls-1.0.tar.gz getdents_ls-1.0
 ```
 
 ### Создаю SPEC файл
 
 ```console
-cd ~/rpmbuild/SPECS
-rpmdev-newspec getdents_ls
+$ cd ~/rpmbuild/SPECS
+$ rpmdev-newspec getdents_ls
 ```
 
 ### Вставляю в getdents_ls.spec следующее
@@ -108,13 +108,13 @@ make %{?_smp_mflags}
 #### С исходниками
 
 ```console
-rpmbuild -bs getdents_ls.spec
+$ rpmbuild -bs getdents_ls.spec
 ```
 
 #### С бинарниками
 
 ```console
-rpmbuild --rebuild ~/rpmbuild/SRPMS/getdents_ls-1.0-1.el7.src.rpm
+$ rpmbuild --rebuild ~/rpmbuild/SRPMS/getdents_ls-1.0-1.el7.src.rpm
 ```
 
 ### Проверяю наличие пакетов
