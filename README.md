@@ -156,6 +156,12 @@ $ cp ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm /usr/share/nginx/ht
 $ wget http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm -O /usr/share/nginx/html/repo/percona-release-0.1-6.noarch.rpm
 ```
 
+### Устанавливаю createrepo
+
+```console
+$ yum install -y createrepo
+```
+
 ### Создаю репозиторий
 
 ```console

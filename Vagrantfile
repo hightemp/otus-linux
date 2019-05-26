@@ -92,9 +92,10 @@ EOF
             mkdir /usr/share/nginx/html/repo
             cp ~/rpmbuild/RPMS/x86_64/getdents_ls-1.0-1.el7.x86_64.rpm /usr/share/nginx/html/repo
             wget http://www.percona.com/downloads/percona-release/redhat/0.1-6/percona-release-0.1-6.noarch.rpm -O /usr/share/nginx/html/repo/percona-release-0.1-6.noarch.rpm
+            yum install -y createrepo
             createrepo /usr/share/nginx/html/repo/
             mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.old
-            awk -v RS="" '{sub(/location\\s*\\/\\s*{[^}]*?}/,"location / { \\n root \/usr\/share\/nginx\/html\/repo; \\n index index.html index.htm; \\n autoindex on; # Добавили эту директиву \\n }")}1' /etc/nginx/nginx.conf.old > /etc/nginx/nginx.conf
+            awk -v RS="" '{sub(/^\\s*location\\s*\\/\\s*{[^}]*?}/,"location / { \\n root \/usr\/share\/nginx\/html\/repo; \\n index index.html index.htm; \\n autoindex on; # Добавили эту директиву \\n }")}1' /etc/nginx/nginx.conf.old > /etc/nginx/nginx.conf
             # systemctl restart nginx
             nginx
             cat > /etc/yum.repos.d/otus.repo << EOF
