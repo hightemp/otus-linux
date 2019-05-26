@@ -235,3 +235,9 @@ $ yum list | grep otus
 
 ![](/images/lesson6/Screenshot_20190526_190402.png)
 
+### Устанавливаю второй пакет
+
+```console
+$ yum install percona-release -y
+```
+
