@@ -104,7 +104,7 @@ $ cat > /etc/sysconfig/spawn-fcgi << EOF
 #
 # Example :
 SOCKET=/var/run/php-fcgi.sock
-OPTIONS="-u apache -g apache -s $SOCKET -S -M 0600 -C 32 -F 1 -P /var/run/spawn-fcgi.pid -- /usr/bin/php-cgi"
+OPTIONS="-u apache -g apache -s $SOCKET -S -M 0600 -C 32 -F 1 -P /var/run/fastcgi-php.pid -- /usr/bin/php-cgi"
 EOF
 ```
 
@@ -119,9 +119,18 @@ After=network.target
 Type=simple
 PIDFile=/var/run/spawn-fcgi.pid
 EnvironmentFile=/etc/sysconfig/spawn-fcgi
-ExecStart=/usr/bin/spawn-fcgi -n $OPTIONS
+ExecStart=/usr/bin/spawn-fcgi -n \$OPTIONS
 KillMode=process
 [Install]
 WantedBy=multi-user.target
 EOF
 ```
+
+### Проверяю
+
+```console
+$ systemctl start spawn-fcgi
+$ systemctl status spawn-fcgi
+```
+
+![](/images/lesson7/Screenshot_20190527_012506.png)
