@@ -133,3 +133,71 @@ $ systemctl status spawn-fcgi
 ```
 
 ![](/images/lesson7/Screenshot_20190527_012506.png)
+
+## Дополнить юнит-файл apache httpd возможностью запустить несколько инстансов сервера с разными конфигами
+
+### Изменяю юнит файл
+
+```console
+$ cat > /lib/systemd/system/httpd@.service << EOF
+[Unit]
+Description=The Apache HTTP Server
+After=network.target remote-fs.target nss-lookup.target
+Documentation=man:httpd(8)
+Documentation=man:apachectl(8)
+[Service]
+Type=notify
+EnvironmentFile=/etc/sysconfig/httpd-%I
+ExecStart=/usr/sbin/httpd \$OPTIONS -DFOREGROUND
+ExecReload=/usr/sbin/httpd \$OPTIONS -k graceful
+ExecStop=/bin/kill -WINCH \${MAINPID}
+KillSignal=SIGCONT
+PrivateTmp=true
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+### Создаю файлы с перемеными окружения
+
+```console
+$ cat > /etc/sysconfig/httpd-first << EOF
+OPTIONS=-f conf/first.conf
+EOF
+```
+
+```console
+$ cat > /etc/sysconfig/httpd-second << EOF
+OPTIONS=-f conf/second.conf
+EOF
+```
+
+### Копирую кофигурационные файлы
+
+```console
+$ cd /etc/httpd/conf/
+$ cp httpd.conf first.conf
+$ cp httpd.conf second.conf
+```
+
+### Правлю второй файл /etc/httpd/conf/second.conf
+
+```
+PidFile /var/run/httpd-second.pid
+Listen 8080
+```
+
+### Запускаю 
+
+```console
+$ systemctl start httpd@first
+$ systemctl start httpd@second
+```
+
+### Проверяю
+
+```console
+$ ss -tnulp | grep httpd
+```
+
+![](/images/lesson7/Screenshot_20190527_200203.png)
