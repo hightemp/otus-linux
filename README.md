@@ -136,7 +136,7 @@ $ systemctl status spawn-fcgi
 
 ## Дополнить юнит-файл apache httpd возможностью запустить несколько инстансов сервера с разными конфигами
 
-### Изменяю юнит файл
+### Создаю юнит файл
 
 ```console
 $ cat > /lib/systemd/system/httpd@.service << EOF
