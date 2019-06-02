@@ -37,37 +37,60 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 
 #### Запускаю вм с помощью GUI VirtualBox
 
-![](/images/lesson8/Screenshot_20190602_173908.png)
+#### Дожидаюсь загрузки GRUB
+#### Вибираю пункт и нажимаю e
 
-#### Нажимаю e
+![](/images/lesson8/Screenshot_20190602_233644.png)
 
 #### Добавляю в строку с linux16 `rw init=/bin/bash`
 
-![]()
+![](/images/lesson8/Screenshot_20190602_234010.png)
+
+#### Проверяю
+
+```console
+$ mount -o remount,rw /
+$ mount | grep root
+```
+
+![](/images/lesson8/Screenshot_20190602_234154.png)
 
 ### Способ 2
 
 #### Запускаю вм с помощью GUI VirtualBox
 
-![](/images/lesson8/Screenshot_20190602_173908.png)
+#### Дожидаюсь загрузки GRUB
+#### Вибираю пункт и нажимаю e
 
-#### Нажимаю e
+![](/images/lesson8/Screenshot_20190602_233644.png)
 
 #### Добавляю в строку с linux16 `rd.break`
 
-![]()
+![](/images/lesson8/Screenshot_20190602_234534.png)
+
+### Меняю пароль
+
+```console
+$ mount -o remount,rw /sysroot
+$ chroot /sysroot
+$ passwd root
+$ touch /.autorelabel
+```
+
+![](/images/lesson8/Screenshot_20190602_234741.png)
 
 ### Способ 3
 
 #### Запускаю вм с помощью GUI VirtualBox
 
-![](/images/lesson8/Screenshot_20190602_173908.png)
+#### Дожидаюсь загрузки GRUB
+#### Вибираю пункт и нажимаю e
 
-#### Нажимаю e
+![](/images/lesson8/Screenshot_20190602_233644.png)
 
 #### Добавляю в строку с linux16 `rw init=/sysroot/bin/sh`
 
-![]()
+![](/images/lesson8/Screenshot_20190602_235109.png)
 
 
 ## Установить систему с LVM, после чего переименовать VG
