@@ -109,5 +109,6 @@ $ mkinitrd -f -v /boot/initramfs-$(uname -r).img $(uname -r)
 $ reboot
 ```
 
+![](/images/lesson8/Screenshot_20190602_232637.png)
 
 ## Добавить модуль в initrd
