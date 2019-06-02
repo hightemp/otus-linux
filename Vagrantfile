@@ -6,7 +6,7 @@ ENV["LC_ALL"] = "en_US.UTF-8"
 MACHINES = {
   :centos => {
         :box_name => "centos/7",
-        :ip_addr => '192.168.11.101'
+        :ip_addr => '192.168.1.100'
   }
 }
 
