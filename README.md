@@ -31,6 +31,7 @@ vb.gui = true
 ![](/images/lesson8/Screenshot_20190602_233644.png)
 
 #### Добавляю в строку с linux16 `rw init=/bin/bash`
+#### Нажимаю CTRL+X
 
 ![](/images/lesson8/Screenshot_20190602_234010.png)
 
@@ -62,6 +63,7 @@ $ touch /.autorelabel
 ![](/images/lesson8/Screenshot_20190602_233644.png)
 
 #### Добавляю в строку с linux16 `rd.break`
+#### Нажимаю CTRL+X
 
 ![](/images/lesson8/Screenshot_20190602_234534.png)
 
@@ -86,6 +88,7 @@ $ touch /.autorelabel
 ![](/images/lesson8/Screenshot_20190602_233644.png)
 
 #### Добавляю в строку с linux16 `rw init=/sysroot/bin/sh`
+#### Нажимаю CTRL+X
 
 ![](/images/lesson8/Screenshot_20190602_235109.png)
 
