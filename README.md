@@ -42,6 +42,8 @@ $ mount -o remount,rw /
 $ mount | grep root
 ```
 
+![](/images/lesson8/Screenshot_20190602_234154.png)
+
 ### Меняю пароль
 
 ```console
@@ -50,8 +52,6 @@ $ chroot /sysroot
 $ passwd root
 $ touch /.autorelabel
 ```
-
-![](/images/lesson8/Screenshot_20190602_234154.png)
 
 ### Способ 2
 
