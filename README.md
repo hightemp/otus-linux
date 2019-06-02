@@ -143,3 +143,75 @@ $ reboot
 ![](/images/lesson8/Screenshot_20190602_232637.png)
 
 ## Добавить модуль в initrd
+
+### Создаю директорию
+
+```console
+$ mkdir /usr/lib/dracut/modules.d/01test
+```
+
+### Создаю файлы
+
+```console
+$ cat > /usr/lib/dracut/modules.d/01test/test.sh <<- EOF
+#!/bin/bash
+
+exec 0<>/dev/console 1<>/dev/console 2<>/dev/console
+cat <<'msgend'
+Hello! You are in dracut module!
+ ___________________
+< I'm dracut module >
+ -------------------
+   \
+    \
+        .--.
+       |o_o |
+       |:_/ |
+      //   \ \
+     (|     | )
+    /'\_   _/\`\
+    \___)=(___/
+msgend
+sleep 10
+echo " continuing...."
+EOF
+```
+
+```console
+$ cat > /usr/lib/dracut/modules.d/01test/module-setup.sh <<- EOF
+#!/bin/bash
+
+check() {
+    return 0
+}
+
+depends() {
+    return 0
+}
+
+install() {
+    inst_hook cleanup 00 "\${moddir}/test.sh"
+}
+EOF
+```
+
+### Пересобираю образ
+
+```console
+$ mkinitrd -f -v /boot/initramfs-$(uname -r).img $(uname -r)
+```
+
+### Проверяю
+
+```console
+$ lsinitrd -m /boot/initramfs-$(uname -r).img | grep test
+```
+
+![](/images/lesson8/Screenshot_20190603_003906.png)
+
+### Перезагружаюсь
+### Дожидаюсь загрузки GRUB
+### Вибираю пункт и нажимаю e
+### Убираю rghb и quiet
+
+![](/images/lesson8/Screenshot_20190603_004211.png)
