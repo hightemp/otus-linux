@@ -4,6 +4,10 @@ home = ENV['HOME']
 ENV["LC_ALL"] = "en_US.UTF-8"
 
 MACHINES = {
+  :centos => {
+        :box_name => "centos/7",
+        :ip_addr => '192.168.11.101'
+  },
   :lvm => {
         :box_name => "centos/7",
         :box_version => "1804.02",
@@ -51,19 +55,21 @@ Vagrant.configure("2") do |config|
                 vb.gui = true
                 vb.customize ["modifyvm", :id, "--memory", "256"]
                 needsController = false
-                boxconfig[:disks].each do |dname, dconf|
-                    if not File.exist?(dconf[:dfile])
-                        print "File not exists ", dconf[:dfile], "\n\n"
-                    
-                    vb.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
-                                  needsController =  true
-                    end
-  
-                end
-                if needsController == true
-                    vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata" ]
+                if (boxconfig.include? :disks)
                     boxconfig[:disks].each do |dname, dconf|
-                        vb.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', dconf[:port], '--device', 0, '--type', 'hdd', '--medium', dconf[:dfile]]
+                        if not File.exist?(dconf[:dfile])
+                            print "File not exists ", dconf[:dfile], "\n\n"
+                        
+                        vb.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
+                                    needsController =  true
+                        end
+    
+                    end
+                    if needsController == true
+                        vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata" ]
+                        boxconfig[:disks].each do |dname, dconf|
+                            vb.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', dconf[:port], '--device', 0, '--type', 'hdd', '--medium', dconf[:dfile]]
+                        end
                     end
                 end
             end
