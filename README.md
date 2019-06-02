@@ -17,18 +17,6 @@ $ sudo su -
 vb.gui = true
 ```
 
-### Редактирую /etc/default/grub
-
-```
-GRUB_TIMEOUT=30
-```
-
-### Обновляю grub
-
-```
-grub2-mkconfig -o /boot/grub2/grub.cfg
-```
-
 </details>
 
 ## Попасть в систему без пароля несколькими способами
