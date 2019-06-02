@@ -89,7 +89,7 @@ $ vgrename centos OtusRoot
 ### Заменяю в файлах /etc/fstab, /etc/default/grub, /boot/grub2/grub.cfg.
 
 ```console
-$ for f in "/etc/fstab" "/etc/default/grub" "/boot/grub2/grub.cfg"; do sed -i 's/centos([-\/])/OtusRoot$1/g' "$f"; done
+$ for f in "/etc/fstab" "/etc/default/grub" "/boot/grub2/grub.cfg"; do sed -i 's/centos\([-/]\)/OtusRoot\1/g' "$f"; done
 ```
 
 ![](/images/lesson8/Screenshot_20190602_225353.png)
@@ -101,7 +101,7 @@ $ for f in "/etc/fstab" "/etc/default/grub" "/boot/grub2/grub.cfg"; do sed -i 's
 $ mkinitrd -f -v /boot/initramfs-$(uname -r).img $(uname -r)
 ```
 
-![](/images/lesson8/Screenshot_20190602_223237.png)
+![](/images/lesson8/Screenshot_20190602_230233.png)
 
 ### Перезагружаюсь
 
