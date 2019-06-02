@@ -93,7 +93,7 @@ $ for f in "/etc/fstab" "/etc/default/grub" "/boot/grub2/grub.cfg"; do sed -i 's
 ```
 
 ![](/images/lesson8/Screenshot_20190602_225353.png)
-![](/images/lesson8/Screenshot_20190602_222610.png)
+![](/images/lesson8/Screenshot_20190602_225600.png)
 
 ### Пересоздаю initrd образ
 
