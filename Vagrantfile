@@ -48,23 +48,24 @@ Vagrant.configure("2") do |config|
             box.vm.network "private_network", ip: boxconfig[:ip_addr]
   
             box.vm.provider :virtualbox do |vb|
-                    vb.customize ["modifyvm", :id, "--memory", "256"]
-                    needsController = false
-            boxconfig[:disks].each do |dname, dconf|
-                if not File.exist?(dconf[:dfile])
-                    print "File not exists ", dconf[:dfile], "\n\n"
+                vb.gui = true
+                vb.customize ["modifyvm", :id, "--memory", "256"]
+                needsController = false
+                boxconfig[:disks].each do |dname, dconf|
+                    if not File.exist?(dconf[:dfile])
+                        print "File not exists ", dconf[:dfile], "\n\n"
                     
-                  vb.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
+                    vb.customize ['createhd', '--filename', dconf[:dfile], '--variant', 'Fixed', '--size', dconf[:size]]
                                   needsController =  true
-                            end
-  
-            end
-                    if needsController == true
-                       vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata" ]
-                       boxconfig[:disks].each do |dname, dconf|
-                           vb.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', dconf[:port], '--device', 0, '--type', 'hdd', '--medium', dconf[:dfile]]
-                       end
                     end
+  
+                end
+                if needsController == true
+                    vb.customize ["storagectl", :id, "--name", "SATA", "--add", "sata" ]
+                    boxconfig[:disks].each do |dname, dconf|
+                        vb.customize ['storageattach', :id,  '--storagectl', 'SATA', '--port', dconf[:port], '--device', 0, '--type', 'hdd', '--medium', dconf[:dfile]]
+                    end
+                end
             end
   
         box.vm.provision "shell", inline: <<-SHELL
