@@ -74,7 +74,7 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 $ vgs
 ```
 
-![] (/images/lesson8/Screenshot_20190602_202302.png)
+![](/images/lesson8/Screenshot_20190602_202302.png)
 
 ### 
 
