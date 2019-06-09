@@ -339,4 +339,111 @@ nginx                      : ok=2    changed=1    unreachable=0    failed=0
 
 ```
 
+### Добавляю шаблон в playbook, номер порта, handler'ы
 
+```console
+$ cat > nginx.yml <<-EOF
+---
+- name: NGINX | Install and configure NGINX
+  hosts: nginx
+  become: true
+  vars:
+    nginx_listen_port: 8080
+
+  tasks:
+    - name: NGINX | Install EPEL Repo package from standart repo
+      yum:
+        name: epel-release
+        state: present
+      tags:
+        - epel-package
+        - packages
+
+    - name: NGINX | Install NGINX package from EPEL Repo
+      yum:
+        name: nginx
+        state: latest
+      notify:
+        - restart nginx
+      tags:
+        - nginx-package
+        - packages
+
+    - name: NGINX | Create NGINX config file from template
+      template:
+        src: ../templates/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify:
+        - reload nginx
+      tags:
+        - nginx-configuration
+
+  handlers:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
+    
+    - name: reload nginx
+      systemd:
+        name: nginx
+        state: reloaded
+EOF
+$ mkdir playbooks
+$ mv *.yml playbooks
+```
+
+```console
+$ cat > templates/nginx.conf.j2 <<-EOF
+# {{ ansible_managed }}
+events {
+    worker_connections 1024;
+}
+
+http {
+    server {
+        listen       {{ nginx_listen_port }} default_server;
+        server_name  default_server;
+        root         /usr/share/nginx/html;
+
+        location / {
+        }
+    }
+}
+EOF
+```
+
+### Запускаю
+
+```console
+$ ansible-playbook playbooks/nginx.yml
+PLAY [NGINX | Install and configure NGINX] *****************************************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************************************************************************************************************
+ok: [nginx]
+
+TASK [NGINX | Install EPEL Repo package from standart repo] ************************************************************************************************************************************************************************************************************
+ok: [nginx]
+
+TASK [NGINX | Install NGINX package from EPEL Repo] ********************************************************************************************************************************************************************************************************************
+ok: [nginx]
+
+TASK [NGINX | Create NGINX config file from template] ******************************************************************************************************************************************************************************************************************
+changed: [nginx]
+
+RUNNING HANDLER [reload nginx] *****************************************************************************************************************************************************************************************************************************************
+changed: [nginx]
+
+PLAY RECAP *************************************************************************************************************************************************************************************************************************************************************
+nginx                      : ok=5    changed=2    unreachable=0    failed=0   
+
+```
+
+### Проверяю
+
+```console
+$ lynx 192.168.11.150:8080
+```
+
+![](/images/lesson9/Screenshot_20190603_004211.png)
