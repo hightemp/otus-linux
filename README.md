@@ -254,9 +254,89 @@ nginx                      : ok=2    changed=0    unreachable=0    failed=0
 
 ```
 
+### Проверяю
 
+```console
+$ ansible nginx -m yum -a "name=epel-release state=absent" -b
+nginx | SUCCESS => {
+    "changed": true, 
+    "msg": "", 
+    "rc": 0, 
+    "results": [
+        "Loaded plugins: fastestmirror\nResolving Dependencies\n--> Running transaction check\n---> Package epel-release.noarch 0:7-11 will be erased\n--> Finished Dependency Resolution\n\nDependencies Resolved\n\n================================================================================\n Package                Arch             Version        Repository         Size\n================================================================================\nRemoving:\n epel-release           noarch           7-11           @extras            24 k\n\nTransaction Summary\n================================================================================\nRemove  1 Package\n\nInstalled size: 24 k\nDownloading packages:\nRunning transaction check\nRunning transaction test\nTransaction test succeeded\nRunning transaction\n  Erasing    : epel-release-7-11.noarch                                     1/1 \n  Verifying  : epel-release-7-11.noarch                                     1/1 \n\nRemoved:\n  epel-release.noarch 0:7-11                                                    \n\nComplete!\n"
+    ]
+}
 
+$ ansible-playbook epel.yml
 
+PLAY [Install EPEL Repo] ***********************************************************************************************************************************************************************************************************************************************
 
+TASK [Gathering Facts] *************************************************************************************************************************************************************************************************************************************************
+ok: [nginx]
+
+TASK [Install EPEL Repo package from standart repo] ********************************************************************************************************************************************************************************************************************
+changed: [nginx]
+
+PLAY RECAP *************************************************************************************************************************************************************************************************************************************************************
+nginx                      : ok=2    changed=1    unreachable=0    failed=0   
+
+```
+
+### Создаю файл nginx.yml
+
+```console
+$ cat > nginx.yml <<-EOF
+---
+- name: NGINX | Install and configure NGINX
+  hosts: nginx
+  become: true
+  
+  tasks:
+    - name: NGINX | Install EPEL Repo package from standart repo
+      yum:
+        name: epel-release
+        state: present
+      tags:
+        - epel-package
+        - packages
+
+    - name: NGINX | Install NGINX package from EPEL Repo
+      yum:
+        name: nginx
+        state: latest
+      tags:
+        - nginx-package
+        - packages
+EOF
+```
+
+### Проверяю
+
+```console
+$ ansible-playbook nginx.yml --list-tags
+
+playbook: nginx.yml
+
+  play #1 (nginx): NGINX | Install and configure NGINX	TAGS: []
+      TASK TAGS: [epel-package, nginx-package, packages]
+```
+
+### Запускаю установку nginx
+
+```console
+$ ansible-playbook nginx.yml -t nginx-package
+
+PLAY [NGINX | Install and configure NGINX] *****************************************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************************************************************************************************************
+ok: [nginx]
+
+TASK [NGINX | Install NGINX package from EPEL Repo] ********************************************************************************************************************************************************************************************************************
+changed: [nginx]
+
+PLAY RECAP *************************************************************************************************************************************************************************************************************************************************************
+nginx                      : ok=2    changed=1    unreachable=0    failed=0   
+
+```
 
 
