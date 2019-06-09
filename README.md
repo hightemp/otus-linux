@@ -446,4 +446,4 @@ nginx                      : ok=5    changed=2    unreachable=0    failed=0
 $ lynx 192.168.11.150:8080
 ```
 
-![](/images/lesson9/Screenshot_20190603_004211.png)
+![](/images/lesson9/Screenshot_20190609_194401.png)
