@@ -182,9 +182,77 @@ nginx | SUCCESS => {
 }
 ```
 
+### Проверяю ядро на хосте
 
+```console
+$ ansible nginx -m command -a "uname -r"
+nginx | SUCCESS | rc=0 >>
+3.10.0-957.5.1.el7.x86_64
 
+```
 
+### Проверяю статус сервиса
+
+```console
+$ ansible nginx -m systemd -a name=firewalld
+nginx | SUCCESS => {
+    "changed": false, 
+    "name": "firewalld", 
+    "status": {
+        "ActiveEnterTimestampMonotonic": "0", 
+        "ActiveExitTimestampMonotonic": "0", 
+        "ActiveState": "inactive", 
+...
+```
+
+### Устанавливаю пакет epel-release
+
+```console
+$ ansible nginx -m yum -a "name=epel-release state=present" -b
+nginx | SUCCESS => {
+    "changed": true, 
+    "msg": "warning: /var/cache/yum/x86_64/7/extras/packages/epel-release-7-11.noarch.rpm: Header V3 RSA/SHA256 Signature, key ID f4a80eb5: NOKEY\nImporting GPG key 0xF4A80EB5:\n Userid     : \"CentOS-7 Key (CentOS 7 Official Signing Key) <security@centos.org>\"\n Fingerprint: 6341 ab27 53d7 8a78 a7c2 7bb1 24c6 a8a7 f4a8 0eb5\n Package    : centos-release-7-6.1810.2.el7.centos.x86_64 (@anaconda)\n From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7\n", 
+    "rc": 0, 
+    "results": [
+        "Loaded plugins: fastestmirror\nDetermining fastest mirrors\n * base: mirror.yandex.ru\n * extras: mirror.reconn.ru\n * updates: mirror.corbina.net\nResolving Dependencies\n--> Running transaction check\n---> Package epel-release.noarch 0:7-11 will be installed\n--> Finished Dependency Resolution\n\nDependencies Resolved\n\n================================================================================\n Package                Arch             Version         Repository        Size\n================================================================================\nInstalling:\n epel-release           noarch           7-11            extras            15 k\n\nTransaction Summary\n================================================================================\nInstall  1 Package\n\nTotal download size: 15 k\nInstalled size: 24 k\nDownloading packages:\nPublic key for epel-release-7-11.noarch.rpm is not installed\nRetrieving key from file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7\nRunning transaction check\nRunning transaction test\nTransaction test succeeded\nRunning transaction\n  Installing : epel-release-7-11.noarch                                     1/1 \n  Verifying  : epel-release-7-11.noarch                                     1/1 \n\nInstalled:\n  epel-release.noarch 0:7-11                                                    \n\nComplete!\n"
+    ]
+}
+
+```
+
+### Создаю playbook в файле epel.yml
+
+```console
+$ cat > epel.yml <<-EOF
+---
+- name: Install EPEL Repo
+  hosts: nginx
+  become: true
+  tasks:
+    - name: Install EPEL Repo package from standart repo
+      yum:
+        name: epel-release
+        state: present
+EOF
+```
+
+### Звпускаю
+
+```console
+$ ansible-playbook epel.yml
+
+PLAY [Install EPEL Repo] ***********************************************************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] *************************************************************************************************************************************************************************************************************************************************
+ok: [nginx]
+
+TASK [Install EPEL Repo package from standart repo] ********************************************************************************************************************************************************************************************************************
+ok: [nginx]
+
+PLAY RECAP *************************************************************************************************************************************************************************************************************************************************************
+nginx                      : ok=2    changed=0    unreachable=0    failed=0   
+
+```
 
 
 
