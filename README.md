@@ -1,28 +1,21 @@
 
 ## Домашнее задание к уроку 9
 
-### Создаю Vagrantfile для centos 7
-
 ```console
-$ vagrant init centos/7
+$  uname -a
+Linux hightemp.unknown.freename.su 3.10.0-957.12.2.el7.x86_64 #1 SMP Tue May 14 21:24:32 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+$ pwd
+/root
 ```
 
-### Запускаю и захожу по ssh
+### Устанавливаю VirtualBox-6.0 и утилиты
 
 ```console
-$ vagrant up
-$ vagrant ssh
-```
-
-### Устанавливаю VirtualBox-5.1
-
-```console
-$ sudo su -
-$ yum -y install gcc dkms make qt libgomp patch wget
+$ yum -y install gcc dkms make qt libgomp patch wget rsync
 $ yum -y install kernel-headers kernel-devel binutils glibc-headers glibc-devel font-forge
 $ cd /etc/yum.repos.d/
 $ wget http://download.virtualbox.org/virtualbox/rpm/rhel/virtualbox.repo
-$ yum install -y VirtualBox-5.1
+$ yum install -y VirtualBox-6.0
 $ /sbin/rcvboxdrv setup
 ```
 
@@ -40,20 +33,19 @@ vboxdrv.sh: failed: Look at /var/log/vbox-install.log to find out what went wron
 ### Устанавливаю пакет 
 
 ```console
-$ yum install kernel-devel-3.10.0-957.5.1.el7.x86_64
+$ yum -y install kernel-devel-3.10.0-957.5.1.el7.x86_64
 $ /sbin/rcvboxdrv setup
 ```
 
-### Устанавливаю Vagrant 1.9.6 64-bit
+### Устанавливаю Vagrant 2.2.4 64-bit
 
 ```console
-$ yum -y install https://releases.hashicorp.com/vagrant/1.9.6/vagrant_1.9.6_x86_64.rpm
+$ yum -y install https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.rpm
 ```
 
 ### Создаю папку и захожу в нее
 
 ```console
-$ exit
 $ mkdir ~/vagrant-home
 $ cd ~/vagrant-home
 ```
@@ -64,6 +56,81 @@ $ cd ~/vagrant-home
 
 ```console
 $ python -V
+Python 2.7.5
 ```
+
+### Устанавливаю Ansible
+
+```console
+$ yum -y install ansible
+```
+
+### Проверяю версию
+
+```console
+$ ansible --version
+ansible 2.4.2.0
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = [u'/root/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Apr  9 2019, 14:30:50) [GCC 4.8.5 20150623 (Red Hat 4.8.5-36)]
+```
+
+### Создаю каталог с помощью ansible-galaxy
+
+```console
+$ ansible-galaxy init ansible
+$ cd ansible/
+$ ls
+defaults  files  handlers  meta  README.md  tasks  templates  tests  vars
+```
+
+### Скачиваю Vagrantfile
+
+```console
+$ curl https://gist.githubusercontent.com/lalbrekht/f811ce9a921570b1d95e07a7dbebeb1e/raw/9d6f9e1ad06b257c3dc6d80a045baa6c5b75dd88/gistfile1.txt -o Vagrantfile
+```
+
+<details><summary>Для случаев запуска ВМ внутри ВМ</summary>
+<p>
+
+VirtualBox начал поддерживать Nested Virtualization в 6.0 версии
+
+### Т.к. VirtualBox не поддерживает виртуализацию 64 битных машин внутри 64 битных заменяю образ на 32 битный
+
+```console
+$ sed -i "s/centos\/7/jasonc\/centos7-32bit/" Vagrantfile
+```
+
+Добавляю строки
+
+```
+            vb.customize ["modifyvm", :id, "--cpus", "1"]
+            vb.customize ["modifyvm", :id, "--ioapic", "on"]
+```
+
+</p>
+</details>
+
+### Поднимаю ВМ
+
+```console
+$ vagrant up
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
