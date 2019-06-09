@@ -119,10 +119,68 @@ $ sed -i "s/centos\/7/jasonc\/centos7-32bit/" Vagrantfile
 $ vagrant up
 ```
 
+### Проверяю параметры `vagrant ssh-config`
+
+```console
+$ vagrant ssh-config
+Host nginx
+  HostName 127.0.0.1
+  User vagrant
+  Port 2222
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentityFile /root/vagrant-home/ansible/.vagrant/machines/nginx/virtualbox/private_key
+  IdentitiesOnly yes
+  LogLevel FATAL
+```
+
+### Создаю inventory файл
+
+```console
+$ mkdir staging
+$ cat > staging/hosts <<-EOF
+[web]
+nginx ansible_host=127.0.0.1 ansible_port=2222 ansible_user=vagrant ansible_private_key_file=/root/vagrant-home/ansible/.vagrant/machines/nginx/virtualbox/private_key
+EOF
+```
+
+### Проеверяю
+
+```console
+$ ansible nginx -i staging/hosts -m ping
+nginx | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+```
 
 
+### Создаю ansible.cfg
 
+```console
+$ cat > ansible.cfg <<-EOF
+[defaults]
+inventory = staging/hosts
+remote_user = vagrant
+host_key_checking = False
+retry_files_enabled = False
+EOF
+```
 
+### Удаляю из staging/hosts и-цию о пользователе
+
+> ansible_user=vagrant
+
+### Проверяю
+
+```console
+$ ansible nginx -m ping
+nginx | SUCCESS => {
+    "changed": false, 
+    "ping": "pong"
+}
+```
 
 
 
