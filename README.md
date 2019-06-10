@@ -24,11 +24,13 @@ EOF
 $ sudo docker build -t otus-linux-lesson10 .
 ```
 
-### Запускаю
+### Запускаю и проверяю
 
 ```console
 $ sudo docker run --name otus-linux-lesson10 -p 80:80 -d otus-linux-lesson10
 ```
+
+![](/images/lesson10/Screenshot_20190611_001652.png)
 
 ### Вхожу 
 
