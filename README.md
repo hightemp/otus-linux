@@ -47,7 +47,7 @@ $ sudo sed -i '/account    required     pam_nologin.so/a account required pam_ti
 
 ![](/images/lesson11/Screenshot_20190618_001815.png)
 
-### Добавим права пользователю day
+## Добавление прав пользователю
 
 ### Подключаю модуль pam_cap
 
@@ -58,19 +58,26 @@ $ sudo sed -i '/auth       include      postlogin/a auth required pam_cap.so' /e
 ### Создаю файл с правами /etc/security/capability.conf
 
 ```console
-$ sudo cat > /etc/security/capability.conf <<-EOF
-cap_net_bind_service day
+$ cat | sudo tee /etc/security/capability.conf <<-EOF
+cap_net_bind_service night
 EOF
 ```
 
 ### Выдаю разрешение программе netcat
 
 ```console
-$ sudo setcap cap_net_bind_service=ei /usr/bin/ncat
+$ sudo yum -y install nc
+$ sudo setcap 'cap_net_bind_service=+ep' /usr/bin/ncat
 ```
+
+> Вариант ниже не сработал
+> `sudo setcap cap_net_bind_service=ei /usr/bin/ncat`
 
 ### Проверяю
 
 ```console
-$ 
+[1]$ ncat -l -p 80
+[2]$ echo "Make Linux great again\!" > /dev/tcp/127.0.0.7/80 
 ```
+
+![](/images/lesson11/Screenshot_20190618_004013.png)
