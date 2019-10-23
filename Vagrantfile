@@ -14,6 +14,22 @@ Vagrant.configure("2") do |config|
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "centos/7"
 
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "playbook.yml"
+    # ansible.inventory_path = "./invertory"
+    ansible.ask_vault_pass = true
+  end
+
+  config.vm.define "server" do |server|
+    server.vm.hostname = "server.home.local"
+    server.vm.network "private_network", ip: "10.0.10.2"
+  end
+
+  config.vm.define "client" do |client|
+    client.vm.hostname = "client.home.local"
+    client.vm.network "private_network", ip: "10.0.10.3"
+  end
+
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.

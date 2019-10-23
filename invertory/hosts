@@ -1,0 +1,5 @@
+[ipaclients]
+client.home.local
+
+[ipaservers]
+server.home.local

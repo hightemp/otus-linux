@@ -1,0 +1,26 @@
+-
+  name: server
+  hosts: server
+  become: true
+  gather_facts: true
+  roles:
+    - remove-host-name-from-hosts
+    -
+      role: ipa-server
+      ipa_realm: HOME.LOCAL
+      ipa_domain: home.local
+      ipa_server_ip: 10.0.10.2
+      hostname: server.home.local
+-
+  name: client
+  hosts: client
+  become: true
+  gather_facts: false
+  roles:
+    -
+      role: ipa-client
+      ipa_realm: HOME.LOCAL
+      ipa_domain: home.local
+      ipa_server_name: server.home.local
+      ipa_server_ip: 10.0.10.2
+      hostname: client.home.local
