@@ -1,0 +1,15 @@
+-
+  name: 'grafana + prometheus server'
+  hosts: grafana
+  become: true
+  gather_facts: false
+  roles:
+    - prometheus
+    - prometheus-node-exporter
+    - grafana
+#- name: zabbix server
+#  hosts: zabbix
+#  become: True
+#  gather_facts: False
+#  roles:
+#    - zabbix

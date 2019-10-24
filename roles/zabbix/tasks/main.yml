@@ -1,0 +1,17 @@
+---
+- name: add nginx repo
+  shell: rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+- name: add nginx repo  
+  yum: 
+    name: nginx
+    state: present
+- name: add zabbix repo
+  copy:
+      dest: /etc/yum.repos.d/grafana.repo
+      src: files/grafana.repo
+- name: install zabbix package
+  yum:
+    name: grafana
+    state: present
+  notify: restart grafana
+...
