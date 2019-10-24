@@ -1,83 +1,70 @@
 
-## Домашнее задание к уроку 11
+## Домашнее задание к уроку 17
 
-> PAM
-> 1. Запретить всем пользователям, кроме группы admin логин в выходные и праздничные дни
+    Домашнее задание 17
+    разворачиваем сетевую лабораторию
+
+    # otus-linux
+    Vagrantfile - для стенда урока 9 - Network
+
+    # Дано
+    https://github.com/erlong15/otus-linux/tree/network
+    (ветка network)
+
+    Vagrantfile с начальным построением сети
+    - inetRouter
+    - centralRouter
+    - centralServer
+
+    тестировалось на virtualbox
+
+    # Планируемая архитектура
+    построить следующую архитектуру
+
+    Сеть office1
+    - 192.168.2.0/26 - dev
+    - 192.168.2.64/26 - test servers
+    - 192.168.2.128/26 - managers
+    - 192.168.2.192/26 - office hardware
+
+    Сеть office2
+    - 192.168.1.0/25 - dev
+    - 192.168.1.128/26 - test servers
+    - 192.168.1.192/26 - office hardware
 
 
-### Создаю трех пользователей
+    Сеть central
+    - 192.168.0.0/28 - directors
+    - 192.168.0.32/28 - office hardware
+    - 192.168.0.64/26 - wifi
 
-```console
-$ sudo useradd day && \
-sudo useradd night && \
-sudo useradd friday
-```
+    ```
+    Office1 ---\
+    -----> Central --IRouter --> internet
+    Office2----/
+    ```
+    Итого должны получится следующие сервера
+    - inetRouter
+    - centralRouter
+    - office1Router
+    - office2Router
+    - centralServer
+    - office1Server
+    - office2Server
 
-### Устанавливаю пароли
+    # Теоретическая часть
+    - Найти свободные подсети
+    - Посчитать сколько узлов в каждой подсети, включая свободные
+    - Указать broadcast адрес для каждой подсети
+    - проверить нет ли ошибок при разбиении
 
-```console
-$ echo "Otus2019" | sudo passwd --stdin day && \
-echo "Otus2019" | sudo passwd --stdin night && \
-echo "Otus2019" | sudo passwd --stdin friday
-```
-
-### Добавляю возможность заходить по SSH по паролю
-
-```console
-$ sudo bash -c "sed -i 's/^PasswordAuthentication.*$/PasswordAuthentication yes/' /etc/ssh/sshd_config && systemctl restart sshd.service"
-```
-
-### Добавляю настройки для модуля pam_time
-
-```console
-$ cat | sudo tee -a /etc/security/time.conf <<-EOF
-*;*;day;Al0800-2000
-*;*;night;!Al0800-2000
-*;*;friday;Fr
-EOF
-```
-
-### Включаю модуль pam_time
-
-```console
-$ sudo sed -i '/account    required     pam_nologin.so/a account required pam_time.so' /etc/pam.d/sshd
-```
-
-### Проверяю
-
-![](/images/lesson11/Screenshot_20190618_001815.png)
-
-## Добавление прав пользователю
-
-### Подключаю модуль pam_cap
-
-```console
-$ sudo sed -i '/auth       include      postlogin/a auth required pam_cap.so' /etc/pam.d/sshd
-```
-
-### Создаю файл с правами /etc/security/capability.conf
-
-```console
-$ cat | sudo tee /etc/security/capability.conf <<-EOF
-cap_net_bind_service night
-EOF
-```
-
-### Выдаю разрешение программе netcat
-
-```console
-$ sudo yum -y install nc
-$ sudo setcap 'cap_net_bind_service=+ep' /usr/bin/ncat
-```
-
-> Вариант ниже не сработал
-> `sudo setcap cap_net_bind_service=ei /usr/bin/ncat`
-
-### Проверяю
+    # Практическая часть
+    - Соединить офисы в сеть согласно схеме и настроить роутинг
+    - Все сервера и роутеры должны ходить в инет черз inetRouter
+    - Все сервера должны видеть друг друга
+    - у всех новых серверов отключить дефолт на нат (eth0), который вагрант поднимает для связи
+    - при нехватке сетевых интервейсов добавить по несколько адресов на интерфейс
 
 ```console
-[1]$ ncat -l -p 80
-[2]$ echo "Make Linux great again\!" > /dev/tcp/127.0.0.7/80 
+$ vagrant up
 ```
-
-![](/images/lesson11/Screenshot_20190618_004013.png)
