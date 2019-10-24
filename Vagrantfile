@@ -1,70 +1,160 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
+MACHINES = {
+  :"backup-server" => {
+    :box_name => "centos/7",
+    :ip_addr => '192.168.11.150',
+    :shell => <<-SHELL
+    yum install -y bacula-director bacula-storage bacula-console postgresql-server policycoreutils-python
+    if [[ ! -f /etc/postgres-inited ]]; then
+
+      postgresql-setup initdb
+      sed -i "s/local   all             all                                     peer/local   all             all                                     peer\\nhost    bacula          bacula          127.0.0.1\\/32            md5\\nhost    bacula          bacula          ::1\\/128                 md5/" /var/lib/pgsql/data/pg_hba.conf
+      systemctl restart postgresql
+
+      PG_BACULA_PASSWORD=`date +%s | sha256sum | base64 | head -c 33`
+      su - postgres <<EOF
+/usr/libexec/bacula/create_postgresql_database
+/usr/libexec/bacula/make_postgresql_tables
+/usr/libexec/bacula/grant_postgresql_privileges
+psql bacula -c "alter user bacula with password '$PG_BACULA_PASSWORD'"
+EOF
+
+        echo "localhost:5432:bacula:bacula:"$PG_BACULA_PASSWORD > /var/spool/bacula/.pgpass
+      chown bacula:bacula /var/spool/bacula/.pgpass
+      chmod 600 /var/spool/bacula/.pgpass
+      systemctl restart postgresql
+      touch /etc/postgres-inited
+    fi
+
+    if [[ ! -f /etc/bacula-inited ]]; then
+      #  make sure .conf files are in same directory as Vagrantfile
+      mkdir -p /etc/bacula/examples/
+      cp /etc/bacula/*.conf /etc/bacula/examples/.
+      cp /vagrant/files/*.conf /etc/bacula/.
+      chown -R root:root /etc/bacula
+      chmod 755 /etc/bacula
+      chmod 640 /etc/bacula/*
+      chgrp bacula /etc/bacula/bacula-dir.conf /etc/bacula/query.sql
+      #  Setting rights - http://www.backupcentral.com/phpBB2/two-way-mirrors-of-external-mailing-lists-3/bacula-25/permission-problem-on-centos-6-5-and-bacula-7-125732/
+
+      #  Set Bacula Component Passwords
+      #  https://www.digitalocean.com/community/tutorials/how-to-install-bacula-server-on-centos-7
+      sed -i "s/@@FD_PASSWORD@@/N2I3NzNmYTg3YzMwOWMzN2NhOTljNmMzY/g" /etc/bacula/bacula-dir.conf
+      sed -i "s/@@FD_PASSWORD@@/N2I3NzNmYTg3YzMwOWMzN2NhOTljNmMzY/g" /etc/bacula/bacula-fd.conf
+      DIR_PASSWORD=`date +%s | sha256sum | base64 | head -c 33`
+      sed -i "s/@@DIR_PASSWORD@@/$DIR_PASSWORD/g" /etc/bacula/bacula-dir.conf
+      sed -i "s/@@DIR_PASSWORD@@/$DIR_PASSWORD/g" /etc/bacula/bconsole.conf
+      SD_PASSWORD=`date +%s | sha256sum | base64 | head -c 33`
+      sed -i "s/@@SD_PASSWORD@@/$SD_PASSWORD/g" /etc/bacula/bacula-dir.conf
+      sed -i "s/@@SD_PASSWORD@@/$SD_PASSWORD/g" /etc/bacula/bacula-sd.conf
+
+      # script folder does not exist
+      mkdir -p /bacula/backup /bacula/restore
+      chown -R bacula:bacula /bacula
+      chmod -R 700 /bacula
+      semanage fcontext -a -t bacula_store_t "/bacula(/.*)?"
+      restorecon -R -v /bacula
+      touch /etc/bacula-inited
+    fi
+
+    systemctl restart bacula-sd bacula-fd bacula-dir
+    systemctl enable bacula-sd bacula-fd bacula-dir postgresql    
+    SHELL
+  },
+  :"backup-client-1" => {
+    :box_name => "centos/7",
+    :ip_addr => '192.168.11.151',
+    :shell => <<-SHELL
+    if [[ $(getent passwd eventstore >/dev/null) -ne 0 ]]; then
+      # Create eventstore
+      mkdir /var/lib/eventstore
+      groupadd -r eventstore
+      useradd -d /var/lib/eventstore -r -g eventstore eventstore
+      chown -R eventstore:eventstore /var/lib/eventstore
+      chmod -R 755 /var/lib/eventstore
+      touch /etc/sysconfig/eventstore
+    fi
+    if [[ ! -f /etc/client-inited ]]; then
+      #  make sure .conf files are in same directory as Vagrantfile
+      mkdir -p /etc/bacula/examples/
+      cp /etc/bacula/bacula-fd.conf /etc/bacula/examples/.
+      cp /vagrant/files/bacula-fd.client1_conf /etc/bacula/bacula-fd.conf
+      sed -i "s/@@FD_PASSWORD@@/N2I3NzNmYTg3YzMwOWMzN2NhOTljNmMzY/" /etc/bacula/bacula-fd.conf
+      mkdir -p /bacula/restore
+      chown -R bacula:bacula /bacula
+      chmod -R 700 /bacula
+      touch /etc/client-inited
+    fi
+    systemctl restart bacula-fd
+    systemctl enable bacula-fd
+  SHELL
+  },
+  :"backup-client-2" => {
+    :box_name => "centos/7",
+    :ip_addr => '192.168.11.152',
+    :shell => <<-SHELL
+    if [[ $(getent passwd eventstore >/dev/null) -ne 0 ]]; then
+      # Create eventstore
+      mkdir /var/lib/eventstore
+      groupadd -r eventstore
+      useradd -d /var/lib/eventstore -r -g eventstore eventstore
+      chown -R eventstore:eventstore /var/lib/eventstore
+      chmod -R 755 /var/lib/eventstore
+      touch /etc/sysconfig/eventstore
+    fi
+    if [[ ! -f /etc/client-inited ]]; then
+      #  make sure .conf files are in same directory as Vagrantfile
+      mkdir -p /etc/bacula/examples/
+      cp /etc/bacula/bacula-fd.conf /etc/bacula/examples/.
+      cp /vagrant/files/bacula-fd.client2_conf /etc/bacula/bacula-fd.conf
+      sed -i "s/@@FD_PASSWORD@@/N2I3NzNmYTg3YzMwOWMzN2NhOTljNmMzY/" /etc/bacula/bacula-fd.conf
+      mkdir -p /bacula/restore
+      chown -R bacula:bacula /bacula
+      chmod -R 700 /bacula
+      touch /etc/client-inited
+    fi
+    systemctl restart bacula-fd
+    systemctl enable bacula-fd
+  SHELL
+  },
+}
+
 Vagrant.configure("2") do |config|
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
 
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "centos/7"
+  MACHINES.each do |boxname, boxconfig|
 
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
+      config.vm.box_check_update = true
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine. In the example below,
-  # accessing "localhost:8080" will access port 80 on the guest machine.
-  # NOTE: This will enable public access to the opened port
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
+      config.vm.provision "shell", inline: <<-SHELL
+        set -x
+        yum update -y && yum upgrade -y
+        yum install -y bacula-client
+      SHELL
 
-  # Create a forwarded port mapping which allows access to a specific port
-  # within the machine from a port on the host machine and only allow access
-  # via 127.0.0.1 to disable public access
-  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+      config.vm.define boxname do |box|
 
-  # Create a private network, which allows host-only access to the machine
-  # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
+          box.vm.box = boxconfig[:box_name]
+          box.vm.host_name = boxname.to_s
 
-  # Create a public network, which generally matched to bridged network.
-  # Bridged networks make the machine appear as another physical device on
-  # your network.
-  # config.vm.network "public_network"
+          box.vm.network "private_network", ip: boxconfig[:ip_addr]
 
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
+          if (boxconfig.key?(:forwarded_port))
+            boxconfig[:forwarded_port].each do |port|
+              box.vm.network "forwarded_port", guest: port, host: port
+            end
+          end
 
-  # Provider-specific configuration so you can fine-tune various
-  # backing providers for Vagrant. These expose provider-specific options.
-  # Example for VirtualBox:
-  #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
+          box.vm.provider :virtualbox do |vb|
+            vb.customize ["modifyvm", :id, "--memory", "1000"]
+          end
+          
+          if (boxconfig.key?(:shell))
+            box.vm.provision "shell", inline: boxconfig[:shell]
+          end
 
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
-  # config.vm.provision "shell", inline: <<-SHELL
-  #   apt-get update
-  #   apt-get install -y apache2
-  # SHELL
+      end
+  end
+
 end
