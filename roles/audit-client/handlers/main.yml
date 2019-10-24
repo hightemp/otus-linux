@@ -1,0 +1,5 @@
+---
+- name: restart audit
+  # for some reason auditd is not correctly restarted with "service" module
+  command: service auditd restart
+...

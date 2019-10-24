@@ -1,0 +1,34 @@
+-
+  name: 'log server'
+  hosts: log
+  become: true
+  gather_facts: false
+  roles:
+    -
+      role: add-entry-to-hosts
+      ip: 10.0.10.3
+      dns: web
+    - rsyslog-server
+    - audit-server
+-
+  name: 'web server'
+  hosts: web
+  become: true
+  gather_facts: false
+  roles:
+    - epel
+    - nginx
+    -
+      role: add-entry-to-hosts
+      ip: 10.0.10.2
+      dns: log
+    -
+      role: nginx-logs-to-remote-server
+      remote_server: log
+    -
+      role: audit-directory
+      audit_dir: /etc/nginx
+      audit_key: nginx_conf
+    -
+      role: audit-client
+      remote_server: log
