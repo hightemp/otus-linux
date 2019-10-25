@@ -1,0 +1,21 @@
+-
+  name: 'start task3_host1'
+  hosts: host1
+  become: true
+  gather_facts: false
+  roles:
+    - 'task3_host1'
+-
+  name: 'start task3_host2'
+  hosts: host2
+  become: true
+  gather_facts: false
+  roles:
+    - 'task3_host2'
+-
+  name: 'start task3_host3'
+  hosts: host3
+  become: true
+  gather_facts: false
+  roles:
+    - 'task3_host3'

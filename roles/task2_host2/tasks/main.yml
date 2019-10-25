@@ -1,0 +1,19 @@
+- 
+  name: install
+  shell: |
+    yum install -y quagga
+    cp /vagrant/files/ifcfg-vlan12-host2 /etc/sysconfig/network-scripts/ifcfg-vlan12
+    cp /vagrant/files/ifcfg-vlan23-host2 /etc/sysconfig/network-scripts/ifcfg-vlan23
+    cp /vagrant/files/daemons /etc/quagga/daemons
+    cp /vagrant/files/host2-zebra.conf /etc/quagga/zebra.conf
+    cp /vagrant/files/host2-ospfd.conf /etc/quagga/ospfd.conf
+    chown quagga:quaggavt /etc/quagga/ospfd.conf
+    chown quagga:quagga /etc/quagga/zebra.conf              
+    echo net.ipv4.conf.all.forwarding=1  >> /etc/sysctl.conf
+    echo net.ipv4.ip_forward=1 >> /etc/sysctl.conf
+    echo net.ipv4.conf.all.rp_filter=0 >> /etc/sysctl.conf
+    systemctl restart network
+    systemctl enable zebra
+    systemctl start zebra
+    systemctl enable ospfd
+    systemctl start ospfd
