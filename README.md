@@ -14,6 +14,21 @@
 
 ```console
 $ . start.sh
-$ . files/knock.sh open
 ```
+
+### Проверка порта
+
+```console
+$ curl -I 127.0.0.1:8080
+```
+
+### Проверка knock скрипта
+
+```console
+$ ssh -i ~/.vagrant.d/insecure_private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null vagrant@127.0.0.1 -p 8001
+$ ssh 192.168.255.1
+$ . /vagrant/files/knock.sh open
+$ ssh 192.168.255.1
+```
+
 
