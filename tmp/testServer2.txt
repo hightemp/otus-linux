@@ -1,0 +1,7 @@
+
+nmcli con add type vlan con-name "VLAN3" dev "eth1" id "3" ipv4.method manual ipv4.address "10.10.10.1/24"
+nmcli connection modify "System eth1" ipv4.dns "8.8.8.8"
+nmcli connection up "System eth1"
+nmcli connection modify "System eth1" ipv4.gateway "192.168.2.65"
+nmcli connection up "System eth1"
+                

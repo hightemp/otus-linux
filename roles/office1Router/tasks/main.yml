@@ -1,0 +1,9 @@
+-
+  name: commands
+  shell: |
+    echo 'net.ipv4.ip_forward = 1' >> /etc/sysctl.conf
+    sysctl -p /etc/sysctl.conf
+    nmcli connection modify "System eth1" ipv4.dns "8.8.8.8"
+    nmcli connection up "System eth1"
+    nmcli connection modify "System eth1" ipv4.gateway "192.168.255.9"
+    nmcli connection up "System eth1"  

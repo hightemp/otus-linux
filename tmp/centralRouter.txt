@@ -1,0 +1,32 @@
+
+                        modprobe bonding
+                        nmcli connection add type bond con-name "bond1" ifname bond0 mode balance-rr
+
+                        nmcli connection modify "bond1" ipv4.addresses "192.168.255.2/30" ipv4.method manual
+
+                        for device in eth1 eth2; do
+                            nmcli connection add type bond-slave con-name "bond1-$device" ifname "$device" master bond0
+                        done
+
+                        nmcli connection up "bond1"
+                
+
+                    echo 'net.ipv4.ip_forward = 1' >> /etc/sysctl.conf
+                    sysctl -p /etc/sysctl.conf
+                  
+
+                            nmcli connection modify "System eth6" +ipv4.routes "192.168.1.0/24 192.168.255.11"
+                            nmcli connection up "System eth6"
+                          
+
+                            nmcli connection modify "System eth6" +ipv4.routes "192.168.2.0/24 192.168.255.10"
+                            nmcli connection up "System eth6"
+                          
+
+                        nmcli connection modify "bond1" ipv4.dns "8.8.8.8"
+                        nmcli connection up "bond1"
+                
+
+                        nmcli connection modify "bond1" ipv4.gateway "192.168.255.1"
+                        nmcli connection up "bond1"
+                

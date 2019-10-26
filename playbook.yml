@@ -1,0 +1,77 @@
+-
+  name: 'centralRouter'
+  hosts: centralRouter
+  become: true
+  gather_facts: false
+  roles:
+    - centralRouter
+-
+  name: 'centralServer'
+  hosts: centralServer
+  become: true
+  gather_facts: false
+  roles:
+    - centralServer
+-
+  name: 'inetRouter'
+  hosts: inetRouter
+  become: true
+  gather_facts: false
+  roles:
+    - inetRouter
+-
+  name: 'office1Router'
+  hosts: office1Router
+  become: true
+  gather_facts: false
+  roles:
+    - office1Router
+-
+  name: 'office1Server'
+  hosts: office1Server
+  become: true
+  gather_facts: false
+  roles:
+    - office1Server
+-
+  name: 'office2Router'
+  hosts: office2Router
+  become: true
+  gather_facts: false
+  roles:
+    - office2Router
+-
+  name: 'office2Server'
+  hosts: office2Server
+  become: true
+  gather_facts: false
+  roles:
+    - office2Server
+-
+  name: 'testClient1'
+  hosts: testClient1
+  become: true
+  gather_facts: false
+  roles:
+    - testClient1
+-
+  name: 'testClient2'
+  hosts: testClient2
+  become: true
+  gather_facts: false
+  roles:
+    - testClient2
+-
+  name: 'testServer1'
+  hosts: testServer1
+  become: true
+  gather_facts: false
+  roles:
+    - testServer1
+-
+  name: 'testServer2'
+  hosts: testServer2
+  become: true
+  gather_facts: false
+  roles:
+    - testServer2
