@@ -1,83 +1,37 @@
+## Домашнее задание 23
 
-## Домашнее задание к уроку 11
+    Простая защита от DDOS
+    Цель: Разобраться в базовых принципах конфигурирования nginx. Рассмотреть хорошие\плохие практики конфигурирования, настройки ssl.
+    https://gitlab.com/otus_linux/nginx-antiddos-example
 
-> PAM
-> 1. Запретить всем пользователям, кроме группы admin логин в выходные и праздничные дни
+    # Простая защита от ДДОС
 
+    ## Защита от ДДОС средствами nginx
+    Написать конфигурацию nginx, которая даёт доступ клиенту только с определенной cookie.
+    Если у клиента её нет, нужно выполнить редирект на location, в котором кука будет добавлена, после чего клиент будет обратно отправлен (редирект) на запрашиваемый ресурс.
 
-### Создаю трех пользователей
+    Смысл: умные боты попадаются редко, тупые боты по редиректам с куками два раза не пойдут
 
-```console
-$ sudo useradd day && \
-sudo useradd night && \
-sudo useradd friday
-```
+    Для выполнения ДЗ понадобятся
+    * https://nginx.org/ru/docs/http/ngx_http_rewrite_module.html
+    * https://nginx.org/ru/docs/http/ngx_http_headers_module.html
 
-### Устанавливаю пароли
+    ## Защита от продвинутых ботов связкой nginx + java script (задание со *)
 
-```console
-$ echo "Otus2019" | sudo passwd --stdin day && \
-echo "Otus2019" | sudo passwd --stdin night && \
-echo "Otus2019" | sudo passwd --stdin friday
-```
+    Защиту из предыдудщего задания можно проверить/преодолеть командой curl -c cookie -b cookie http://localhost/otus.txt -i -L
+    Ваша задача написать такую конфигурацию, которая отдает контент клиенту умеющему java script и meta-redirect
 
-### Добавляю возможность заходить по SSH по паролю
+    Для выполнения понадобятся:
+    * https://www.w3.org/TR/WCAG20-TECHS/H76.html
+    * http://nginx.org/en/docs/http/ngx_http_core_module.html#error_page
+    * Базовые знания java script 
 
-```console
-$ sudo bash -c "sed -i 's/^PasswordAuthentication.*$/PasswordAuthentication yes/' /etc/ssh/sshd_config && systemctl restart sshd.service"
-```
-
-### Добавляю настройки для модуля pam_time
-
-```console
-$ cat | sudo tee -a /etc/security/time.conf <<-EOF
-*;*;day;Al0800-2000
-*;*;night;!Al0800-2000
-*;*;friday;Fr
-EOF
-```
-
-### Включаю модуль pam_time
+    ## Инструкции для выполнения и сдачи
+    * Необходимо редактировать nginx.conf из этого репозитория (не следует использовать include и править Dockerfile)
+    * Cделанную работу нужно залить hub.docker.com, при этом content в otus.txt должен содержать в себе название Вашего репозитория hub.docker.com и только его
+    * Базовое задание должно быть в образе с тегом latest, задание для продвинутых в образе с тегом advanced.
+    * Самопроверка: docker run -p 80:80 your_account/your_repo:latest (или your_account/your_repo:advanced) - запустит nginx c выполненым заданием. сurl http://localhost/otus.txt - редирект(или ошибка) , открыв ту же страницу в браузере - увидим your_account/your_repo
 
 ```console
-$ sudo sed -i '/account    required     pam_nologin.so/a account required pam_time.so' /etc/pam.d/sshd
+$ sudo docker run -p 8090:80 hightemp/otus-linux-lesson23:latest
 ```
-
-### Проверяю
-
-![](/images/lesson11/Screenshot_20190618_001815.png)
-
-## Добавление прав пользователю
-
-### Подключаю модуль pam_cap
-
-```console
-$ sudo sed -i '/auth       include      postlogin/a auth required pam_cap.so' /etc/pam.d/sshd
-```
-
-### Создаю файл с правами /etc/security/capability.conf
-
-```console
-$ cat | sudo tee /etc/security/capability.conf <<-EOF
-cap_net_bind_service night
-EOF
-```
-
-### Выдаю разрешение программе netcat
-
-```console
-$ sudo yum -y install nc
-$ sudo setcap 'cap_net_bind_service=+ep' /usr/bin/ncat
-```
-
-> Вариант ниже не сработал
-> `sudo setcap cap_net_bind_service=ei /usr/bin/ncat`
-
-### Проверяю
-
-```console
-[1]$ ncat -l -p 80
-[2]$ echo "Make Linux great again\!" > /dev/tcp/127.0.0.7/80 
-```
-
-![](/images/lesson11/Screenshot_20190618_004013.png)
