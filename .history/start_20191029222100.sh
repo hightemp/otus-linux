@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "$1" != "latest" ]; then
+if [ "$1" == "latest" ]; then
     echo "[!] build docker file"
     sudo docker build .
 fi
